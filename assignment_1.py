@@ -26,6 +26,9 @@ for id in data['id'].unique():
     print(id, data[data['id'] == id].shape[0])
 
 
+# add new comment
+
+
 # Print minimum, maximum, mean, and standard deviation of 'variable' column:
 for var in data['variable'].unique():
     print(var)
