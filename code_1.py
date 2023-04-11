@@ -48,7 +48,16 @@ for id in ids:
 
     d["user{0}".format(id)] = new_data
 
+
+### Plots of mood
 for id in d:
-    print(id)
-    
-print(d['userAS14.01'])
+    id_ex = d[id]
+
+# Plot time series of mood
+    plt.figure(figsize=(15, 5))
+    plt.plot(id_ex['time'], id_ex['mood'])
+    plt.title('Mood over time')
+    plt.xlabel('Time')
+    plt.ylabel('Mood')
+    plt.show()
+
