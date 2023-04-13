@@ -3,6 +3,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import json
+import csv
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 
 print(os.getcwd())
 
@@ -14,7 +19,6 @@ for col in data['variable'].unique():
     newcol = data[data['variable'] == col]
     newcol = newcol.rename(columns={'value': col})
     data[col] = newcol[col]
-
 
 
 d = {}
@@ -45,7 +49,6 @@ for id in ids:
 
         new_data[col] = col_agg.values.flatten()
 
-
     d["user{0}".format(id)] = new_data
 
 
@@ -53,6 +56,21 @@ for id in ids:
 for id in d:
     id_ex = d[id]
 
+    first = id_ex['mood'].first_valid_index()
+    last = id_ex['mood'].last_valid_index()
+
+    print(first, last)
+
+    # Delete all rows before first and after last:
+    id_ex = id_ex.drop(id_ex.index[last:])
+    id_ex = id_ex.drop(id_ex.index[:first])
+    id_ex = id_ex.reset_index(drop=True)
+
+    for col in id_ex.columns:
+       # print nr of missing values
+         print(col, id_ex[col].isna().sum())
+
+    
 # Plot time series of mood
     plt.figure(figsize=(15, 5))
     plt.plot(id_ex['time'], id_ex['mood'])
@@ -61,3 +79,4 @@ for id in d:
     plt.ylabel('Mood')
     plt.show()
 
+    
