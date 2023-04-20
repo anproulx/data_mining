@@ -51,6 +51,48 @@ for id in ids:
 
     d["user{0}".format(id)] = new_data
 
+# some feature engineering
+
+for id in d.keys():
+
+  # drop nas for mood target
+  d[id] = d[id].dropna(subset = ['mood'])
+  
+  # add column #n entries for that each id
+  n_days_id = len(d[id])
+  list_days = [i for i in range(n_days_id)]
+  d[id]['n_days_id'] = list_days
+  
+  # add target mood
+  d[id]['target_mood_plus1'] = d[id]['mood'].shift(-1) 
+  # d[id]['target_mood_plus2'] = d[id]['mood'].shift(-2)
+    
+  # day difference with previous obs
+  d[id]['day_shift'] = d[id]['days'].shift(-1)
+  
+  # deal with prolonged period of missing
+  d[id]['day_diff'] = d[id]['day_shift']- d[id]['days']
+  
+  # get time elapsed
+  start = pd.DatetimeIndex(d[id]['time'])[0]
+  d[id]['time_elapsed'] = pd.DatetimeIndex(d[id]['time']) - start
+  
+  # dropnans
+  d[id] = d[id].dropna(subset = ['target_mood_plus1',	'target_mood_plus2', 'day_shift',	'day_diff'])
+  
+  # if difference day interval t vs t+1 is over 4, drop
+  d[id] = d[id][d[id]['day_diff'] < 4]
+
+# some more features if needed
+
+# add day & month as binary variable
+all_data['month'] = pd.DatetimeIndex(all_data['time']).month # needs to be hot encoded
+all_data['day'] = pd.DatetimeIndex(all_data['time']).day 
+
+# add seasons as categorical variable
+season = {2 : 'winter', 3 : 'spring', 4 : 'spring', 5 :'summer', 6: 'summer'}
+all_data['season'] = all_data.month
+all_data['season'] = all_data['season'].replace(season) # to be hot encoded
 
 ### Plots of mood
 for id in d:
